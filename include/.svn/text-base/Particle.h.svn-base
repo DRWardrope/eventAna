@@ -1,0 +1,38 @@
+#ifndef PARTICLE_H
+#define PARTICLE_H
+#include "Math/Vector4D.h"
+#include "Math/GenVector/LorentzVector.h"
+#include "Math/GenVector/PtEtaPhiE4D.h"
+#include "TString.h"
+#include <map>
+#include <vector>
+
+//#include "ParticleFwd.h"
+//class Particle : public ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double> >
+class Particle : public ROOT::Math::PtEtaPhiEVector
+{
+	public:
+		Particle() : ROOT::Math::PtEtaPhiEVector(), m_id() {};
+		Particle(int index) : ROOT::Math::PtEtaPhiEVector(), m_id(index) {};
+		Particle(const float& pt, const float& eta, const float& phi, const float& E, int id=-99) 
+			: ROOT::Math::PtEtaPhiEVector(pt, eta, phi, E), m_id(id) {};
+		Particle(ROOT::Math::PtEtaPhiEVector p4, int id=-99) : ROOT::Math::PtEtaPhiEVector(p4), m_id(id) {};
+		
+	//	Particle operator+(const Particle& rhs) const;
+		float	deltaPhi(const Particle&) const;
+		float	deltaR(const Particle&) const;
+		const 	TString& label() const { return m_label; };
+		int		index() const { return m_id; };
+		bool	isMatched(const std::vector<Particle>&, float dRMax=0.4) const;
+		std::vector<Particle> match(const std::vector<Particle>&, float dRMax=0.4);
+		int		pdgId() const { return m_pdgId;}
+		int		status() const { return m_status;}
+		void	setLabel(const TString& label) { m_label = label;}
+		void	setStatus(const int& status) { m_status = status;}
+		void	setPdgId(const int& pdgId) { m_pdgId = pdgId; }
+	
+	protected:
+	int m_id, m_pdgId, m_status;
+	TString m_label;
+};
+#endif

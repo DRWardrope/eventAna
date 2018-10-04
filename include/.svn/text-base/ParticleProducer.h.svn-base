@@ -1,0 +1,41 @@
+/***********************************************************************************************
+*	ParticleProducer
+*	A class to create Particle objects from AktNtuple contents and store in Event.h
+*
+*	David Wardrope, 29th November 2012
+*
+***********************************************************************************************/
+#ifndef PARTICLEPRODUCER_H
+#define PARTICLEPRODUCER_H
+
+//#include "ProducerBase.h"
+#include "Event.h"
+#include "Particle.h"
+#include <stdlib.h> 
+
+extern bool m_debug;
+//extern float m_minBWeight;
+class ParticleProducer 
+{
+	public:
+        ParticleProducer(Event& evt, int status=1):
+				m_evt(evt), m_status(status)
+		{ 
+			if(m_debug) std::cout<<"ParticleProducer()"<< std::endl;
+			setupBranches(); 
+		}
+        ~ParticleProducer(){
+        }
+		std::vector<Particle> produce(int selPdgId=0);
+	private:
+		void fillArrays();
+		void setupBranches();
+
+		Event& m_evt;
+		int m_status;
+		
+		//TTree variables
+		std::vector<int> *m_part_pdgId, *m_part_status;
+		std::vector<double> *m_part_pt, *m_part_eta, *m_part_phi, *m_part_m;
+};
+#endif

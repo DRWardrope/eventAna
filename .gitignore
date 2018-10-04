@@ -1,0 +1,13 @@
+.DS_STORE
+MCFiles/
+submitAll.sh
+batchSubmit*
+*.root
+*.pdf
+*.aux
+*.log
+TTBarVeto/
+*.pyc
+log
+*.swn
+!.gitignore

@@ -1,0 +1,59 @@
+/***********************************************************************************************
+*	TrackJetProducer
+*	A class to create Jet objects from AktNtuple contents and store in Event.h
+*
+*	David Wardrope, 29th November 2012
+*
+***********************************************************************************************/
+#ifndef TRACKJETPRODUCER_H
+#define TRACKJETPRODUCER_H
+
+//#include "ProducerBase.h"
+#include "Event.h"
+#include "Jet.h"
+#include <stdlib.h> 
+
+extern bool m_debug;
+//extern float m_minBWeight;
+class TrackJetProducer 
+{
+	public:
+        TrackJetProducer(Event& evt, const TString& branchStem, const TString& name, const TString& systLabel, int btagWP=77):
+				m_evt(evt), m_name(name), m_systLabel(systLabel), m_btagWP(btagWP)
+		{ 
+			if(m_debug) std::cout<<"TrackJetProducer("<< name <<", "<< systLabel <<")"<< std::endl;
+			m_branchStem = "jet_"+branchStem;
+			setupBranches(); 
+			findMinBTag(name);
+		}
+        ~TrackJetProducer(){
+        }
+		std::vector<Jet> produce(std::vector<Jet>* caloJets=NULL);
+		void findMinBTag(const TString& name)
+		{
+			// R=0.2 track-jets:
+			if(m_btagWP == 60) m_minBWeight = 0.1899;
+			else if(m_btagWP == 70) m_minBWeight = -0.3098;
+			else if(m_btagWP == 77) m_minBWeight = -0.6134;
+			else if(m_btagWP == 85) m_minBWeight = -0.8433;
+			else m_minBWeight = -99.;
+		}
+	private:
+		void fillArrays();
+		void setupBranches();
+
+		Event& m_evt;
+		std::string m_name, m_branchStem;
+		TString m_systLabel;
+		//std::vector<Jet>* m_caloJets;
+		int m_btagWP;
+		float m_minBWeight;
+		
+		//TTree variables
+		//std::vector<int> *m_jet_n;
+		std::vector<std::vector<double> > *m_jet_pt, *m_jet_eta, *m_jet_phi, *m_jet_m;
+		std::vector<std::vector<double> > *m_jet_mv2c20;
+		std::vector<std::vector<int> > *m_jet_nBQuarks;
+		//float m_jet_btag_sf[__nJets], m_jet_btag_sferr[__nJets], m_jet_btag_sfvarup[__nJets][10],m_jet_btag_sfvardn[__nJets][10];
+};
+#endif

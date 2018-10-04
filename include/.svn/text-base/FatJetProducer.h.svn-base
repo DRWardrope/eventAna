@@ -1,0 +1,44 @@
+/***********************************************************************************************
+*	FatJetProducer
+*	A class to create Jet objects from AktNtuple contents and store in Event.h
+*
+*	David Wardrope, 29th November 2012
+*
+***********************************************************************************************/
+#ifndef FATJETPRODUCER_H
+#define FATJETPRODUCER_H
+
+//#include "ProducerBase.h"
+#include "Event.h"
+#include "Jet.h"
+#include <stdlib.h> 
+
+extern bool m_debug;
+//extern float m_minBWeight;
+class FatJetProducer 
+{
+	public:
+        FatJetProducer(Event& evt, const TString& branchStem, const TString& name, const TString& systLabel, int jetCalib=0):
+				m_evt(evt), m_name(name), m_systLabel(systLabel), m_jetCalib(jetCalib)
+		{ 
+			if(m_debug) std::cout<<"FatJetProducer("<< name <<", "<< systLabel <<")"<< std::endl;
+			m_branchStem = "jet_"+branchStem;
+			setupBranches(); 
+		}
+        ~FatJetProducer(){
+        }
+		std::vector<Jet> produce();
+	private:
+		void fillArrays();
+		void setupBranches();
+
+		Event& m_evt;
+		std::string m_name, m_branchStem;
+		TString m_systLabel;
+		int m_jetCalib;
+		
+		//TTree variables
+		int m_jet_n;
+		std::vector<double> *m_jet_pt, *m_jet_eta, *m_jet_phi, *m_jet_m;
+};
+#endif

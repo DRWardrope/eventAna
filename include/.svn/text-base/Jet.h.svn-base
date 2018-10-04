@@ -1,0 +1,62 @@
+#ifndef JET_H
+#define JET_H
+
+//#include "JetFwd.h"
+#include "Particle.h"
+//#include "Utils.h"
+
+class Jet : public Particle
+{
+	public:
+		Jet() : Particle(), m_mv2c20(-99.) {};
+		Jet(int index) : Particle(index), m_mv2c20(-99.) {};
+//		Jet& operator=(const Jet&);
+		Jet(float pt, float eta, float phi, float E, int id=-99, float mv2c20=1.) 
+			: Particle(pt, eta, phi, E, id), m_mv2c20(mv2c20) {};
+		Jet(Particle part, float mv2c20=-99.) 
+			: Particle(part), m_mv2c20(mv2c20) {};
+		Jet(ROOT::Math::PtEtaPhiEVector p4, int id=-99, float mv2c20=-99.) 
+			: Particle(p4, id), m_mv2c20(mv2c20) {};
+	        //Jet operator+(const Jet& rhs) const;
+		bool isBTagged() const { return m_btagged; }
+		bool isMuonCorrected() const { return m_muCorrected; }
+		float mv2c20() const { return m_mv2c20; }
+		float btag_sf() const { return m_btag_sf; }
+		float btag_sfUnc() const { return m_btag_sfUnc; }
+		bool isMatched(const std::vector<Jet>&, float dRMax=0.4) const;
+		float jes() const {return m_jes; }
+		float jesUnc() const {return m_jesUnc; }
+		float jer() const {return m_jer; }
+		float jerUnc() const {return m_jerUnc; }
+		std::vector<const Jet*> trackJets() const {return m_trackJets; }//dR to the closest matching truth jet in dR
+		float truthdR() const {return m_truthdR; }//dR to the closest matching truth jet in dR
+		float truthEta() const {return m_truthEta; }//eta of the closest matching truth jet in dR
+		int   truthFlav() const {return m_truthFlav; }
+		float truthPhi() const {return m_truthPhi; }//phi of the closest matching truth jet in dR
+		float truthPt() const {return m_truthPt; }//pT of the closest matching truth jet in dR
+		void setIsBTagged(bool isBTagged) { m_btagged = isBTagged; }
+		void setIsMuonCorrected(bool isMuCorrected) { m_muCorrected = isMuCorrected; }
+		void setJES(float jes) { m_jes = jes; }
+		void setJESUnc(float jesUnc) { m_jesUnc = jesUnc; }
+		void setJER(float jer) { m_jer = jer; }
+		void setJERUnc(float jerUnc) { m_jerUnc = jerUnc; }
+		void setBTagSF(float btag_sf){m_btag_sf = btag_sf; }
+		void setBTagSFUnc(float btag_sfUnc){m_btag_sfUnc = btag_sfUnc; }
+		void setMV2c20(float mv2c20) { m_mv2c20 = mv2c20; }
+		void setTrackJets(std::vector<const Jet*> trackJets) { m_trackJets = trackJets; }
+		void setTruthE(float truthE) { m_truthE = truthE; }
+		void setTruthPt(float truthPt) { m_truthPt = truthPt; }
+		void setTruthdR(float truthdR) { m_truthdR = truthdR; }
+		void setTruthPhi(float truthPhi) { m_truthPhi = truthPhi; }
+		void setTruthEta(float truthEta) { m_truthEta = truthEta; }
+		void setTruthFlav(int truthFlav) { m_truthFlav = truthFlav; }
+	protected:
+		bool m_muCorrected, m_btagged;
+		float m_mv2c20, m_btag_sf, m_btag_sfUnc;
+		float m_jes, m_jesUnc, m_jer, m_jerUnc;
+		float m_truthE, m_truthPt, m_truthdR, m_truthPhi, m_truthEta;
+		int m_truthFlav; 
+		std::vector<const Jet*> m_trackJets;
+};
+//typedef std::vector<Jet> JetCollection
+#endif 

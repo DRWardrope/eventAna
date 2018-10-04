@@ -1,0 +1,176 @@
+#ifndef EVENT_H
+#define EVENT_H
+
+#include <deque>
+#include <iostream>
+#include <map>
+#include <memory>
+#include "TFile.h"
+#include "TH1.h"
+#include "TString.h"
+#include "TTree.h"
+//#include "Jet.h"
+//#include "Dijet.h"
+//#include "DijetsPair.h"
+
+//#include "Utils.h"
+
+extern bool m_debug;
+class Event 
+{
+	public:
+		Event() : m_fileIn(NULL), m_xsecWeight(-99.), m_eventID(0) {};
+		Event(TFile* fileIn, const double& xsecWeight, const std::vector<TString>& trigList) : m_fileIn(fileIn), m_xsecWeight(xsecWeight), m_xsec(-99.), m_eventID(0) 
+		{ 	
+			this->tree()->SetBranchStatus("*", 0);
+			setTriggers(trigList);
+			setupBranches(); 
+		};
+		Event(std::vector<std::pair<TFile*, double> >::const_iterator fileIt, const std::vector<TString>& trigList) 
+			: m_fileIn(fileIt->first), m_xsecWeight(fileIt->second), m_xsec(-99.), m_eventID(0) 
+		{ 
+			if(m_debug) std::cout <<"Event: Analyse events from File("<< fileIt->first->GetName() <<", "<< fileIt->second <<")"<< std::endl;
+			this->tree()->SetBranchStatus("*", 0);
+			if(m_debug) std::cout <<"Event: Set branch status to 0" << std::endl;
+			setTriggers(trigList);
+			setupBranches(); 
+		};
+		Event(std::vector<std::pair<TString, std::pair<double, double> > >::const_iterator fileIt, const std::vector<TString>& trigList) 
+			: m_fileInName(fileIt->first), m_xsecWeight(fileIt->second.first), m_xsec(fileIt->second.second), m_eventID(0) 
+		{ 
+			if(m_debug) std::cout <<"Event: Analyse events from File("<< fileIt->first <<", "<< fileIt->second.first <<")"<< std::endl;
+			m_fileIn = TFile::Open(m_fileInName, "READ");
+			m_tree = (TTree*) m_fileIn->Get("XhhMiniNtuple");
+			m_tree->SetBranchStatus("*", 0);
+			if(m_debug) std::cout <<"Event: Set branch status to 0" << std::endl;
+			setTriggers(trigList);
+			setupBranches(); 
+			load(0);
+		};
+		~Event(){
+			//Don't try and delete branches and trees as closing the files does this
+			//and will seg fault if you have already done it.
+			//If this causes problems try m_fileIn->GetList()->Print() to see if root has 
+			//stupidly given ownership of anything else to this file.
+			m_fileIn->Close();
+			delete m_fileIn;
+		};
+		void addBranch(const char* name)
+		{
+			//	std::cout<<"Event::addBranch: this->tree()->SetBranchStatus("<< name <<", "<< true <<")" << std::endl;
+			unsigned int found = 0;
+			m_tree->SetBranchStatus(name, true, &found);
+			//std::cout<<"Branch "<< name <<", found = "<< found << std::endl;
+			if(found) m_data.insert(std::pair<std::string, TBranch*>(name, m_tree->GetBranch(name)));
+			else{
+				 std::cout <<"ERROR: Event::addBranch: "<< name <<" was not found in TTree "<< m_tree->GetName() 
+								<<" of "<< m_fileIn->GetName()<< std::endl;
+			}
+		}
+		void addMCWeight();
+		void addPileUpWeight();
+		void addWeight(const TString&, float);
+		void fillArrays();
+		void getEntry(const char* name, void* handle)
+		{
+			std::map<std::string, TBranch*>::const_iterator branchIt; 
+			branchIt = m_data.find(name);
+			if(branchIt != m_data.end())
+			{
+				if(branchIt->second != NULL)
+				{
+					branchIt->second->SetAddress(handle);
+					branchIt->second->GetEntry(m_eventID);
+				}else{
+					std::cout<<"Event::getEntry: Error! TBranch "<< name <<" was not found in the TTree!"<< std::endl;
+				}
+			}	
+		}
+		long id() const {return m_eventID; }
+		int number() const {return m_eventNumber; }
+		bool isGood() {return m_passGRL; }
+		bool isMC() {if(m_isMC<=0) {return false;} else {return true;}}
+		const std::string& label() const { return m_label; }
+		void load(size_t eventID)
+		{
+			if(eventID < this->nEvents())
+			{
+				m_eventID = eventID;
+				m_weights.clear();
+				m_weights.insert(std::pair<TString, float>("Cross-section", m_xsecWeight));//SPEED: Needn't be inserted every time.
+				m_weightProd = m_xsecWeight;
+				//m_produced.clear();
+				fillArrays();
+			}else{
+				std::cout<<"ERROR! goToEvent("<< eventID <<") failed because total events = "<< this->nEvents() << std::endl;
+			}
+		}
+		TString name() const { return "BLARG"; }//getNiceName(m_fileInName); }
+		size_t nEvents() const {return m_tree->GetEntries(); }
+		//int nVtx5() const {return m_nVtx5;};
+		//bool passJetCleaning() {if(m_jetCleaningLooser == 0) return false; else return true;}
+		//bool passLArVeto() {if(m_larError == 2) return false; else return true;}
+		//bool passTileVeto() {if(m_tileError == 2) return false; else return true;}
+		//bool passTileTrip() {return m_passTileTrip;}
+		//bool passIsIncomplete() {return !m_isIncomplete;}
+		void refresh();
+		void setLabel(const std::string& label) { m_label = label; }
+		void setLabel(const TString& label) { m_label = label; }
+		void setupBranches();
+		void setTriggers(const std::vector<TString>& trigList)
+		{
+			for(std::vector<TString>::const_iterator trig = trigList.begin(); trig != trigList.end(); ++trig)
+			{
+				m_trigger.insert(std::pair<TString, bool>(*trig, false));
+			}
+		}
+		//TTree* tree() const { return (TTree*) m_fileIn->Get("AktNtupleMaker/AktNtuple"); }
+		TTree* tree() const 
+		{ 
+			TTree *t = (TTree*) m_fileIn->Get("XhhMiniNtuple");
+			return t; 
+		}
+		bool triggered() const;
+		bool triggered(const TString& path) const;
+		float weight() const { return m_weightProd; } //return product of all weights
+		float weight(const TString&) const; //return specified weight only 
+		const std::map<TString, float>& weights() const { return m_weights; };
+		float xsec() const {return m_xsec; }
+		//float met() const{return m_met;}
+		//float metphi() const{return m_met_phi;}
+		//std::pair<float,float> CalcTTbarX(const DijetRefCollection& dijets, const JetRefCollection& extraJets);
+		//std::pair<float,float> CalcScaledTTbarX(const DijetRefCollection& dijets, const JetRefCollection& extraJets);
+		int eventNumber() const {return m_eventNumber; }
+		int runNumber() const {return m_runNumber; }
+		//int passTrigger(TString trigger);
+		//float getTopPtReweight();
+		//float getTruthTopPt(int a);
+
+	private:
+		TFile* m_fileIn;
+		TTree* m_tree;
+		TString m_fileInName;
+		std::string m_label;
+		float m_xsec, m_xsecWeight;
+		float m_pileupWeight;
+		float m_mcWeight;//used to reweight JZW samples event-by-event
+		float m_weightProd; //Product of all weights in m_weights
+		std::map<TString, float> m_weights;
+		std::map<TString, bool> m_trigger;
+		//int m_run, m_lbn, m_evt;
+		long m_eventID;
+		int m_eventNumber;
+		int m_runNumber;
+		int m_isMC;
+		//float m_met, m_met_phi;
+		//float m_met;
+		//int m_nVtx5;
+		bool m_passGRL;// m_passTightGRL, m_passTileTrip, m_isIncomplete;
+		//int m_jetCleaningLooser, m_larError, m_nVtx5, m_tileError;
+		//double m_ttbarX;
+		//Container for arrays pointed to by the TTree.
+		std::map<std::string, TBranch*> m_data; 
+		//Container for collections of objects within the event:
+		//std::map<std::string, std::shared_ptr<void> > m_produced; //std::vector<std::shared_ptr<Particle> > > m_produced;
+};
+#endif 

@@ -1,0 +1,67 @@
+/***********************************************************************************************
+*	JetProducer
+*	A class to create Jet objects from AktNtuple contents and store in Event.h
+*
+*	David Wardrope, 29th November 2012
+*
+***********************************************************************************************/
+#ifndef JETPRODUCER_H
+#define JETPRODUCER_H
+
+//#include "ProducerBase.h"
+#include "Event.h"
+#include "Jet.h"
+#include <stdlib.h> 
+
+extern bool m_debug;
+//extern float m_minBWeight;
+class JetProducer 
+{
+	public:
+        JetProducer(Event& evt, const TString& branchStem, const TString& name, const TString& systLabel, int jetCalib=0, int btagWP=77):
+				m_evt(evt), m_name(name), m_systLabel(systLabel), m_jetCalib(jetCalib), m_btagWP(btagWP)
+		{ 
+			if(m_debug) std::cout<<"JetProducer("<< name <<", "<< systLabel <<")"<< std::endl;
+			m_branchStem = "jet_"+branchStem;
+			setupBranches(); 
+			findMinBTag(name);
+		}
+        ~JetProducer(){
+        }
+		std::vector<Jet> produce(const float& ptMin = -99., bool rejectNonBTagged=false);
+		std::vector<Jet> produceBTagged(const float& ptMin = -99.) { return produce(ptMin, true); }
+		void findMinBTag(const TString& name)
+		{
+			// R=0.4 TopoEM-jets:
+			if(m_btagWP == 60) m_minBWeight = 0.4496;
+			else if(m_btagWP == 70) m_minBWeight = -0.0436;
+			else if(m_btagWP == 77) m_minBWeight = -0.4434;
+			else if(m_btagWP == 85) m_minBWeight = -0.7887;
+			else m_minBWeight = -99.;
+			/* R=0.2 track-jets:
+			if(m_btagWP == 60) m_minBWeight = 0.1899;
+			else if(m_btagWP == 70) m_minBWeight = -0.3098;
+			else if(m_btagWP == 77) m_minBWeight = -0.6134;
+			else if(m_btagWP == 85) m_minBWeight = -0.8433;
+			else m_minBWeight = -99.;*/
+		}
+	private:
+		void fillArrays();
+		void setupBranches();
+
+		Event& m_evt;
+		std::string m_name, m_branchStem;
+		TString m_systLabel;
+		int m_jetCalib;
+		int m_btagWP;
+		float m_minBWeight;
+		
+		//TTree variables
+		int m_jet_n;
+		std::vector<float> *m_jet_pt, *m_jet_eta, *m_jet_phi, *m_jet_E;
+		std::vector<float> *m_jet_mv2c20;
+		//float m_jet_btag_sf[__nJets], m_jet_btag_sferr[__nJets], m_jet_btag_sfvarup[__nJets][10],m_jet_btag_sfvardn[__nJets][10];
+		std::vector<float> *m_jet_truthE, *m_jet_truthpt, *m_jet_trutheta, *m_jet_truthphi; 
+		std::vector<int> *m_jet_truthflav;
+};
+#endif
