@@ -1,5 +1,5 @@
-#ifndef TREEMANAGER_H 
-#define TREEMANAGER_H
+#ifndef VLQTREEMANAGER_H 
+#define VLQTREEMANAGER_H
 #include <array>
 #include <random>
 #include "Event.h"
@@ -9,10 +9,10 @@
 #include "TopCandidate.h"
 extern bool m_debug;
 
-class TreeManager
+class VLQTreeManager
 {
 	public:
-		TreeManager(std::string name): m_name(name)
+		VLQTreeManager(std::string name): m_name(name)
 		{
 			this->bookTrees();
 			std::random_device rd;//Get random number generator seed from hardware device, if available
@@ -21,19 +21,19 @@ class TreeManager
 		}
 		//Implement the following destructor to delete the TTree* held by the class.
 		//I should really either follow the "Rule of Three" or use std::unique_ptr.
-		~TreeManager()
+		~VLQTreeManager()
 		{
 			for(std::map<std::string, TTree*>::iterator it = m_tree.begin(); it != m_tree.end(); ++it)
 			{
-				std::cout<<"TreeManager::~TreeManager: Deleting "<< it->first ;
+				std::cout<<"VLQTreeManager::~VLQTreeManager: Deleting "<< it->first ;
 				std::cout<<": TTree name = "<< it->second->GetName() <<", title = "<< it->second->GetTitle() <<" address = "<< it->second <<std::endl;
 				delete it->second;	
 			}
 		}
 		void findAndFillTree(const std::string&);
 		void fillCutFlow(std::map<std::string, double>, std::string);
-		void fillTree(Event& event, const std::array<HiggsCandidate, 2>&, const std::vector<Jet>&, 
-						const std::vector<Electron>&, const std::vector<Muon>&, const std::vector<TopCandidate>&);
+		void fillTree(Event& event, const std::vector<VLQCandidate>&, const std::vector<Jet>&, 
+						const std::vector<Electron>&, const std::vector<Muon>&);
 		void setName(const std::string& name){ m_name = name; }
 		void write(TFile* fOut);
 	private:
@@ -41,10 +41,6 @@ class TreeManager
 		void addVectorBranch(TTree*, std::string);
 		void book(TTree*);
 		void bookTrees();
-		float calcDhh(const std::array<HiggsCandidate, 2>&);
-		float calcRhh(const std::array<HiggsCandidate, 2>&);
-		float calcXhh(const std::array<HiggsCandidate, 2>&);
-		float calcDPhi4jMin(const std::array<HiggsCandidate, 2>& hcands, const float& met_phi);
 		float calcMEff(const float& met, const std::vector<Jet>&);
 		float calcMEff(const float& met, const std::vector<Jet>&, const std::vector<Muon>&, const std::vector<Electron>&);
 		//float calcMEffHC(const float& met, const std::array<HiggsCandidate, 2>&);

@@ -1,20 +1,17 @@
 //so far only supports floats and ints in the output tree
-#include "TreeManager.h"
+#include "VLQTreeManager.h"
 #include "Math/Boost.h"
 #include "Math/Vector3D.h"
-void TreeManager::bookTrees()
+void VLQTreeManager::bookTrees()
 {
 	m_includeTruthDetails = false;
 	TTree* t = new TTree("Output", "");
 
 	//Bare minimum variables:
 	addBranch(t, "weight", "F");
-	addBranch(t, "btrigSF", "F");
-	addBranch(t, "HLT_2j35_bmv2c2060_split_2j35_L14J15.0ETA25", "I");
-	addBranch(t, "HLT_j100_2j55_bmv2c2060_split", "I");
-	addBranch(t, "HLT_j225_bmv2c2060_split", "I");
+	addBranch(t, "HLT_j460", "I");
 	addBranch(t, "MEt", "F");
-	addBranch(t, "deltaPhi4jMin", "F");
+
 	addBranch(t, "meff", "F");
 	addBranch(t, "meffLeps", "F");
 	addBranch(t, "meffHC", "F");
@@ -27,59 +24,24 @@ void TreeManager::bookTrees()
 	addBranch(t, "eff50TagBits", "I");
 	addBranch(t, "eff30TagBits", "I");
 
-	addBranch(t, "hcand1_m", "F");
-	addBranch(t, "hcand1_pt", "F");
-	addBranch(t, "hcand1_dRjj", "F");
-	addBranch(t, "hcand1_nTrackJets", "I");
-	addBranch(t, "hcand1_jet1_pt", "F");
-	addBranch(t, "hcand1_jet1_eta", "F");
-	addBranch(t, "hcand1_jet1_trackMoverP", "F");
-	addBranch(t, "hcand1_jet1_flav", "I");
-	addBranch(t, "hcand1_jet1_muCorr", "I");
-	addBranch(t, "hcand1_jet2_pt", "F");
-	addBranch(t, "hcand1_jet2_eta", "F");
-	addBranch(t, "hcand1_jet2_trackMoverP", "F");
-	addBranch(t, "hcand1_jet2_flav", "I");
-	addBranch(t, "hcand1_jet2_muCorr", "I");
-	addBranch(t, "hcand1_tagBits", "I");
+	addBranch(t, "hcand_m", "F");
+	addBranch(t, "hcand_pt", "F");
+	addBranch(t, "hcand_dRjj", "F");
+	addBranch(t, "hcand_nTrackJets", "I");
+	addBranch(t, "hcand_jet1_pt", "F");
+	addBranch(t, "hcand_jet1_eta", "F");
+	addBranch(t, "hcand_jet1_flav", "I");
+	addBranch(t, "hcand_jet1_muCorr", "I");
+	addBranch(t, "hcand_jet2_pt", "F");
+	addBranch(t, "hcand_jet2_eta", "F");
+	addBranch(t, "hcand_jet2_flav", "I");
+	addBranch(t, "hcand_jet2_muCorr", "I");
+	addBranch(t, "hcand_tagBits", "I");
 
-	addBranch(t, "hcand2_m", "F");
-	addBranch(t, "hcand2_pt", "F");
-	addBranch(t, "hcand2_dRjj", "F");
-	addBranch(t, "hcand2_nTrackJets", "I");
-	addBranch(t, "hcand2_jet1_pt", "F");
-	addBranch(t, "hcand2_jet1_eta", "F");
-	addBranch(t, "hcand2_jet1_trackMoverP", "F");
-	addBranch(t, "hcand2_jet1_flav", "I");
-	addBranch(t, "hcand2_jet1_muCorr", "I");
-	addBranch(t, "hcand2_jet2_pt", "F");
-	addBranch(t, "hcand2_jet2_eta", "F");
-	addBranch(t, "hcand2_jet2_trackMoverP", "F");
-	addBranch(t, "hcand2_jet2_flav", "I");
-	addBranch(t, "hcand2_jet2_muCorr", "I");
-	addBranch(t, "hcand2_tagBits", "I");
-
-	addBranch(t, "hcand1_hcand2_dEta", "F");
-	addBranch(t, "hcand1_hcand2_dR", "F");
-	addBranch(t, "hcand1_hcand2_m", "F");
-	addBranch(t, "hcand1_hcand2_pt", "F");
-	addBranch(t, "hcand1_hcand2_scaledM", "F");
-
-	addBranch(t, "Xt1", "F");
-	addBranch(t, "mTop1", "F");
-	addBranch(t, "mW1", "F");
-	addBranch(t, "Dhh", "F");
-	addBranch(t, "Rhh", "F");
-	addBranch(t, "Xhh", "F");
-
-	addBranch(t, "cosThetaStar", "F");
-	addBranch(t, "cosTheta1", "F");
-	addBranch(t, "cosTheta2", "F");
-	addBranch(t, "Phi", "F");
-	addBranch(t, "Phi1", "F");
-	addBranch(t, "extraJet1_pt", "F");
-	addBranch(t, "extraJet1_eta", "F");
-	addBranch(t, "extraJet1_HH_dPhi", "F");
+	addBranch(t, "vlqcand_dR", "F");
+	addBranch(t, "vlqcand_m", "F");
+	addBranch(t, "vlqcand_pt", "F");
+	addBranch(t, "vlqcand_scaledM", "F");
 
 	addBranch(t, "electron_veto", "I");
 	addBranch(t, "electron1_pt", "F");
@@ -97,30 +59,13 @@ void TreeManager::bookTrees()
 	addBranch(t, "muon1_quality", "I");
 	addBranch(t, "muon1_isolated", "I");
 
-	addBranch(t, "muon2_pt", "F");
-	addBranch(t, "muon2_eta", "F");
-	addBranch(t, "muon2_phi", "F");
-	addBranch(t, "muon2_E", "F");
-
-	addBranch(t, "dimuon_pt", "F");
-	addBranch(t, "dimuon_eta", "F");
-	addBranch(t, "dimuon_phi", "F");
-	addBranch(t, "dimuon_E", "F");
-	addBranch(t, "dimuon_m", "F");
-
-	addBranch(t, "GCdR_min", "F");
-	addBranch(t, "GCdR_max", "F");
-	addBranch(t, "GCdR_diff", "F");
-	addBranch(t, "GCdR_sum", "F");
-	addBranch(t, "avgAbsHCJetEta", "F");
-
 	book(t);
 }
 
-void TreeManager::book(TTree* tBase)
+void VLQTreeManager::book(TTree* tBase)
 {
-	std::cout<<"TreeManager::book(TTree* "<< tBase->GetName() <<"):"<< std::endl;
-	std::cout<<"TreeManager::book: name = "<< m_name << std::endl;
+	std::cout<<"VLQTreeManager::book(TTree* "<< tBase->GetName() <<"):"<< std::endl;
+	std::cout<<"VLQTreeManager::book: name = "<< m_name << std::endl;
 	std::array<std::string, 2> tags{{"SemiTagged", "FullyTagged"}};
 	for(auto tag: tags)
 	{
@@ -133,127 +78,56 @@ void TreeManager::book(TTree* tBase)
 	}
 }
 
-void TreeManager::fillTree(Event& event, const std::array<HiggsCandidate, 2>& hcands, const std::vector<Jet>& jets, 
-							const std::vector<Electron>& electrons, const std::vector<Muon>& muons,
-							const std::vector<TopCandidate>& tops)
+void VLQTreeManager::fillTree(Event& event, const VLQCandidate& vlqCand, const std::vector<Jet>& jets, 
+							const std::vector<Electron>& electrons, const std::vector<Muon>& muons)
 {
-	if(m_debug) std::cout<<"TreeManager::fillTree(Event "<< event.id() <<")"<< std::endl;		
-	if(hcands[0].numTightTags() + hcands[1].numTightTags() < 2) return; // Skip events with fewer than 2 tight b-tags
-	if(hcands[0].category() != 0 || hcands[1].category() != 0) return;
-	if(calcRhh(hcands) > 75) return;
+	if(m_debug) std::cout<<"VLQTreeManager::fillTree(Event "<< event.id() <<")"<< std::endl;		
 	//event level variables
 	fillVar("event", event.number());//changed this to be the event number from the ntuple
 	fillVar("eventNumber", event.eventNumber());
 	fillVar("runNumber", event.runNumber());
 	fillVar("weight", event.weight());
-	if(event.isMC())
-	{
-		//std::cout<<"I'm apparently a MC event!"<< std::endl;
-		fillVar("genWeight", event.weight("MC"));//*event.weight("Cross-section"));
-		fillVar("xsWeight", event.weight("Cross-section"));
-		fillVar("puWeight", event.weight("PileUp"));
-		fillVar("btagWeight", event.weight("BTagSF"));
-		fillVar("jvtEffSF", event.weight("JvtEffSF"));
-		fillVar("btrigSF", event.weight("BTrigSF"));
-	}else
-	{
-		fillVar("genWeight", 1.);
-		fillVar("xsWeight", 1.);
-		fillVar("puWeight", 1.);
-		fillVar("btagWeight", 1.);
-		fillVar("jvtEffSF", 1.);
-		fillVar("btrigSF", 1.);
-		
-	}
 
-	if(event.isMC())
-	{
-		fillVar("HLT_2j35_bmv2c2060_split_2j35_L14J15.0ETA25", event.triggerBits().triggered("HLT_2j35_bmv2c2060_split_2j35_L14J15.0ETA25_emul"));
-		fillVar("HLT_j100_2j55_bmv2c2060_split", event.triggerBits().triggered("HLT_j100_2j55_bmv2c2060_split_emul"));
-		fillVar("HLT_j225_bmv2c2060_split", event.triggerBits().triggered("HLT_j225_bmv2c2060_split_emul"));
-	}else{
-		fillVar("HLT_2j35_bmv2c2060_split_2j35_L14J15.0ETA25", event.triggerBits().triggered("HLT_2j35_bmv2c2060_split_2j35_L14J15.0ETA25"));
-		fillVar("HLT_j100_2j55_bmv2c2060_split", event.triggerBits().triggered("HLT_j100_2j55_bmv2c2060_split"));
-		fillVar("HLT_j225_bmv2c2060_split", event.triggerBits().triggered("HLT_j225_bmv2c2060_split"));
-	}
+	fillVar("HLT_j460", event.triggerBits().triggered("HLT_j460"));
 
-	std::bitset<4> eff70TagBits;
-	std::bitset<4> eff60TagBits;
-	std::bitset<4> eff50TagBits;
-	std::bitset<4> eff30TagBits;
+	std::bitset<3> eff70TagBits;
+	std::bitset<3> eff60TagBits;
+	std::bitset<3> eff50TagBits;
+	std::bitset<3> eff30TagBits;
 	eff70TagBits.reset(); //sets all bits to 0
 	eff60TagBits.reset(); //sets all bits to 0
 	eff50TagBits.reset(); //sets all bits to 0
 	eff30TagBits.reset(); //sets all bits to 0
-	if(m_debug) std::cout<<"TreeManager::fillTree: obtained event weight."<< std::endl;		
+	if(m_debug) std::cout<<"VLQTreeManager::fillTree: obtained event weight."<< std::endl;		
 	//Assume that there are two HiggsCandidates in the array that are ordered correctly (i.e. by pt).
+	HiggsCandidate hcand = vlqCand->getHiggs();
 	std::vector<Jet> hcandJets;
-	float avgAbsHCJetEta = 0.;
 	for(int i = 0; i < 2; ++i)
 	{
-		for(int j = 0; j < 2;  ++j)
-		{
-			Jet hcJet = hcands[i].getJetRef(j);
-			hcandJets.push_back(hcJet);
-			avgAbsHCJetEta += fabs(hcJet.eta());
-		}
+		Jet hcJet = hcands.getJetRef(i);
+		hcandJets.push_back(hcJet);
 	}
 	std::sort(hcandJets.begin(), hcandJets.end(), [](const Jet a, const Jet b) 
 	{
         return b.Pt() < a.Pt();   
     }); 
-	fillVar("avgAbsHCJetEta", 0.25*avgAbsHCJetEta);
-	float dRMin = 5.;
-	float dR2ndMin = 5.;
-	for(std::vector<Jet>::const_iterator jet1 = hcandJets.begin(); jet1 != hcandJets.end(); ++jet1)
-	{
-		for(std::vector<Jet>::const_iterator jet2 = jet1+1; jet2 != hcandJets.end(); ++jet2)
-		{
-			//if(jet1 == jet2) continue; //jet1 can't equal jet2 because of iterator ranges
-			float dR = jet1->deltaR(*jet2);
-			if(dR < dRMin)
-			{
-				dRMin = dR;
-				for(std::vector<Jet>::const_iterator jet3 = hcandJets.begin(); jet3 != hcandJets.end(); ++jet3)
-				{
-					if(jet3 == jet1 || jet3 == jet2) continue;
-					for(std::vector<Jet>::const_iterator jet4 = jet3+1; jet4 != hcandJets.end(); ++jet4)
-					{
-						if(jet4 == jet3 || jet4 == jet2 || jet4 == jet1) continue;
-						dR2ndMin = jet3->deltaR(*jet4);
-					}
-				}
-			}
-		}
-	}
-	fillVar("GCdR_min", dRMin);
-	fillVar("GCdR_max", dR2ndMin);
-	fillVar("GCdR_diff", dR2ndMin - dRMin);
-	fillVar("GCdR_sum", dR2ndMin + dRMin);
 	fillVar("MEt", event.met());
 	//fillVar("MEt_phi", event.metphi());
-	fillVar("deltaPhi4jMin", calcDPhi4jMin(hcands, event.metphi()));
 	fillVar("TriggerBits", event.triggerBits().to_ulong());
 	fillVar("meff", calcMEff(event.met(), jets));
 	fillVar("meffLeps", calcMEff(event.met(), jets, muons, electrons));
 	fillVar("meffHC", calcMEff(event.met(), hcandJets));
 	fillVar("mtbmin", calcMtBMin(event.met(), event.metphi(), hcandJets));
 	
-	for(unsigned int i = 0; i < 2; ++i)
-	{
-		std::string branchPrefix = "hcand"+std::to_string(i+1)+"_";
-		fillVar(branchPrefix + "m", hcands[i].M());
-		fillVar(branchPrefix + "pt", hcands[i].Pt());
-		fillVar(branchPrefix + "numTightTags", hcands[i].numTightTags());
-		//fillVar(branchPrefix + "category", hcands[i].category());
-		fillVar(branchPrefix + "TrackJetsDRjj", hcands[i].deltaRTrackJets());
-		fillVar(branchPrefix + "truthHiggsId", hcands[i].truthHiggsId());
-		if(hcands[i].category() < 2)
+	
+		fillVar("hcand_m", hcand.M());
+		fillVar("hcand_pt", hcand.Pt());
+		fillVar("hcand_numTightTags", hcand.numTightTags());
+		//fillVar("hcand_TrackJetsDRjj", hcand.deltaRTrackJets());
+		std::bitset<2> candTagBits; //These are Higgs-candidate-specific and will have fake content for four-tag events
+		candTagBits.reset(); //sets all bits to 0
+		for(int j = 0; j < 2; ++j)
 		{
-			std::bitset<2> candTagBits; //These are Higgs-candidate-specific and will have fake content for four-tag events
-			candTagBits.reset(); //sets all bits to 0
-			for(int j = 0; j < 2; ++j)
-			{
 				fillP4(branchPrefix+"jet"+std::to_string(j+1)+"_", hcands[i].getJet(j)->p4(), false);
 				//fillP4(branchPrefix+"jet"+std::to_string(j+1)+"_", hcands[i].getJet(j)->p4(), true);
 				fillVar(branchPrefix+"jet"+std::to_string(j+1)+"_flav", hcands[i].getJet(j)->pdgId());
@@ -293,7 +167,7 @@ void TreeManager::fillTree(Event& event, const std::array<HiggsCandidate, 2>& hc
 			//std::cout<<"About to fill "<< branchPrefix <<"eff70TagBits with "<< candTagBits.to_ulong() << std::endl;
 			fillVar(branchPrefix+"eff70TagBits", candTagBits.to_ulong());
 		}
-		if(m_debug) std::cout<<"TreeManager::fillTree: halfway through candidate "<< i <<"."<< std::endl;
+		if(m_debug) std::cout<<"VLQTreeManager::fillTree: halfway through candidate "<< i <<"."<< std::endl;
 		if(m_includeTruthDetails)
 		{
 			if(hcands[i].category() < 2)
@@ -304,7 +178,7 @@ void TreeManager::fillTree(Event& event, const std::array<HiggsCandidate, 2>& hc
 			fillVar(branchPrefix+"dRbb", hcands[i].deltaRbb());
 		}
 		int nTrackJets = 0;
-		if(m_debug) std::cout<<"TreeManager::fillTree: category = "<< hcands[i].category() << std::endl;
+		if(m_debug) std::cout<<"VLQTreeManager::fillTree: category = "<< hcands[i].category() << std::endl;
 		if(hcands[i].category() == 0)
 		{
 			nTrackJets += hcands[i].getJet(0)->matchedTrackJets().size();
@@ -371,28 +245,28 @@ void TreeManager::fillTree(Event& event, const std::array<HiggsCandidate, 2>& hc
 			findAndFillTree(label);
 		}
 	}
-	if(m_debug) std::cout<<"TreeManager::fillTree: completed."<< std::endl;
+	if(m_debug) std::cout<<"VLQTreeManager::fillTree: completed."<< std::endl;
 }
 
-float TreeManager::calcDhh(const std::array<HiggsCandidate, 2>& hcands)
+float VLQTreeManager::calcDhh(const std::array<HiggsCandidate, 2>& hcands)
 {
 	float thetaSR = 0.741947; //atan(110, 120);
 	float theta = atan(hcands[1].M()/hcands[0].M()) - thetaSR;
 	return fabs(sqrt(hcands[0].M()*hcands[0].M()+hcands[1].M()*hcands[1].M())*sin(theta)); 
 }
-float TreeManager::calcXhh(const std::array<HiggsCandidate, 2>& hcands)
+float VLQTreeManager::calcXhh(const std::array<HiggsCandidate, 2>& hcands)
 {
 	float dM0 = (hcands[0].M() - 120.0)/(0.1*hcands[0].M());
 	float dM1 = (hcands[1].M() - 110.0)/(0.1*hcands[1].M());
 	return sqrt(dM0*dM0 + dM1*dM1);
 }
-float TreeManager::calcRhh(const std::array<HiggsCandidate, 2>& hcands)
+float VLQTreeManager::calcRhh(const std::array<HiggsCandidate, 2>& hcands)
 {
 	float dM0 = (hcands[0].M() - 120.0);
 	float dM1 = (hcands[1].M() - 110.0);
 	return sqrt(dM0*dM0 + dM1*dM1);
 }
-float TreeManager::calcDPhi4jMin(const std::array<HiggsCandidate, 2>& hcands, const float& met_phi)
+float VLQTreeManager::calcDPhi4jMin(const std::array<HiggsCandidate, 2>& hcands, const float& met_phi)
 {
 	float minDPhi = 99999.;
 	for(int i = 0; i < 2; ++i)
@@ -413,7 +287,7 @@ float TreeManager::calcDPhi4jMin(const std::array<HiggsCandidate, 2>& hcands, co
 	return minDPhi;
 }
 
-void TreeManager::fillJetInfo(const std::array<HiggsCandidate, 2>& hcands, const std::vector<Jet>& jets)
+void VLQTreeManager::fillJetInfo(const std::array<HiggsCandidate, 2>& hcands, const std::vector<Jet>& jets)
 {
 	fillVar("jet_n", jets.size());
 	int bjet_n = 0;
@@ -464,7 +338,7 @@ void TreeManager::fillJetInfo(const std::array<HiggsCandidate, 2>& hcands, const
 		fillP4Dummy("extraJet2_");
 	}
 }
-void TreeManager::fillElectronInfo(Event& event, const std::array<HiggsCandidate, 2>& hcands, const std::vector<Electron>& electrons, const std::vector<Jet>& jets)
+void VLQTreeManager::fillElectronInfo(Event& event, const std::array<HiggsCandidate, 2>& hcands, const std::vector<Electron>& electrons, const std::vector<Jet>& jets)
 {
 	int electron_n = 0;
 	assert(std::is_sorted(electrons.begin(), electrons.end(), [](const Electron a, const Electron b){ return b.Pt() < a.Pt();}));
@@ -511,7 +385,7 @@ void TreeManager::fillElectronInfo(Event& event, const std::array<HiggsCandidate
 		fillVar("electron1_minDRj", minDRj);
 	}
 }
-void TreeManager::fillMuonInfo(Event& event, const std::array<HiggsCandidate, 2>& hcands, const std::vector<Muon>& muons, const std::vector<Jet>& jets)
+void VLQTreeManager::fillMuonInfo(Event& event, const std::array<HiggsCandidate, 2>& hcands, const std::vector<Muon>& muons, const std::vector<Jet>& jets)
 {
 	assert(std::is_sorted(muons.begin(), muons.end(), [](const Muon a, const Muon b){ return b.Pt() < a.Pt();}));
 	std::vector<Muon> extraMuons;
@@ -571,7 +445,7 @@ void TreeManager::fillMuonInfo(Event& event, const std::array<HiggsCandidate, 2>
 		}
 	}
 }
-void TreeManager::fillMelaAngles(const std::array<HiggsCandidate, 2>& hcands)
+void VLQTreeManager::fillMelaAngles(const std::array<HiggsCandidate, 2>& hcands)
 {
 	ROOT::Math::PtEtaPhiEVector q1_lab = hcands[0];
 	ROOT::Math::PtEtaPhiEVector q2_lab = hcands[1];
@@ -630,7 +504,7 @@ void TreeManager::fillMelaAngles(const std::array<HiggsCandidate, 2>& hcands)
 	fillVar("cosTheta1",  fabs(q1_XRF.Vect().Dot(q11_H1RF.Vect()) / sqrt(q1_XRF.Vect().Mag2()*q11_H1RF.Vect().Mag2())));
 	fillVar("cosTheta2",  fabs(q2_XRF.Vect().Dot(q21_H2RF.Vect()) / sqrt(q2_XRF.Vect().Mag2()*q21_H2RF.Vect().Mag2())));
 }
-void TreeManager::fillP4(const std::string& branchStem, const ROOT::Math::PtEtaPhiEVector& p4, const bool absEta)
+void VLQTreeManager::fillP4(const std::string& branchStem, const ROOT::Math::PtEtaPhiEVector& p4, const bool absEta)
 {
 	fillVar(branchStem+"pt", p4.Pt());
 	if(absEta)
@@ -644,14 +518,14 @@ void TreeManager::fillP4(const std::string& branchStem, const ROOT::Math::PtEtaP
 	fillVar(branchStem+"E", p4.E());
 	fillVar(branchStem+"m", p4.M());
 }
-void TreeManager::fillP4Dummy(const std::string& branchStem)
+void VLQTreeManager::fillP4Dummy(const std::string& branchStem)
 {
 	fillVar(branchStem+"pt", -99.);
 	fillVar(branchStem+"eta", -99.);
 	fillVar(branchStem+"phi", -99.);
 	fillVar(branchStem+"E", -99.);
 }
-void TreeManager::fillVar(std::string varName, double value)
+void VLQTreeManager::fillVar(std::string varName, double value)
 {
 	//LUKE: add error message if this isn't found
 	std::string type = m_typeMap[varName];
@@ -663,33 +537,33 @@ void TreeManager::fillVar(std::string varName, double value)
 		m_varMap_F[varName] = value;
 	}
 }
-void TreeManager::fillVar(std::string varName, std::vector<float> value)
+void VLQTreeManager::fillVar(std::string varName, std::vector<float> value)
 {
 	(m_varMap_V[varName]).clear();
 	m_varMap_V[varName] = value;
 }
-void TreeManager::findAndFillTree(const std::string& variation)
+void VLQTreeManager::findAndFillTree(const std::string& variation)
 {
 	std::map<std::string, TTree*>::iterator it = m_tree.find(variation);
 	if(it != m_tree.end())
 	{
 		it->second->Fill();
 	}else{
-		std::cout<<"TreeManager::findAndFillTree("<< variation <<"): couldn't find TTree for "<< variation << std::endl;
+		std::cout<<"VLQTreeManager::findAndFillTree("<< variation <<"): couldn't find TTree for "<< variation << std::endl;
 	}
 }
-void TreeManager::write(TFile* fOut)
+void VLQTreeManager::write(TFile* fOut)
 {
 	fOut->cd();
-	std::cout<<"TreeManager::writeAll: Writing "<< m_tree.size() <<" trees."<< std::endl;
+	std::cout<<"VLQTreeManager::writeAll: Writing "<< m_tree.size() <<" trees."<< std::endl;
 	for(std::map<std::string, TTree*>::iterator it = m_tree.begin(); it != m_tree.end(); ++it)
 	{
-		std::cout<<"TreeManager::writeAll: Writing "<< it->first ;
+		std::cout<<"VLQTreeManager::writeAll: Writing "<< it->first ;
 		std::cout<<": TTree name = "<< it->second->GetName() <<", title = "<< it->second->GetTitle() <<" address = "<< it->second <<std::endl;
 		it->second->Write();
 	}
 }
-void TreeManager::addBranch(TTree* t, std::string varName, std::string varType)
+void VLQTreeManager::addBranch(TTree* t, std::string varName, std::string varType)
 {
 	m_typeMap[varName] = varType;
 	if(varType == "I")
@@ -701,12 +575,12 @@ void TreeManager::addBranch(TTree* t, std::string varName, std::string varType)
 		t->Branch(varName.c_str(), &(m_varMap_F[varName]), (varName + "/" + varType).c_str());
 	}
 }
-void TreeManager::addVectorBranch(TTree* t, std::string varName)
+void VLQTreeManager::addVectorBranch(TTree* t, std::string varName)
 {
 	m_typeMap[varName] = "V";
 	t->Branch(varName.c_str(), &(m_varMap_V[varName]));
 }
-float TreeManager::deltaPhi(const float& phi1, const float& phi2)
+float VLQTreeManager::deltaPhi(const float& phi1, const float& phi2)
 {
 	float dphi = phi1 - phi2;
 	while(dphi >=  M_PI)
@@ -715,7 +589,7 @@ float TreeManager::deltaPhi(const float& phi1, const float& phi2)
 		dphi += 2.*M_PI;
 	return dphi;
 }
-float TreeManager::deltaPhi(const ROOT::Math::PtEtaPhiEVector& vec1, const ROOT::Math::PtEtaPhiEVector& vec2)
+float VLQTreeManager::deltaPhi(const ROOT::Math::PtEtaPhiEVector& vec1, const ROOT::Math::PtEtaPhiEVector& vec2)
 {
 	float dphi = vec1.Phi() - vec2.Phi();
 	while(dphi >=  M_PI)
@@ -724,25 +598,25 @@ float TreeManager::deltaPhi(const ROOT::Math::PtEtaPhiEVector& vec1, const ROOT:
 		dphi += 2.*M_PI;
 	return dphi;
 }
-float TreeManager::deltaR(const ROOT::Math::PtEtaPhiEVector& vec1, const ROOT::Math::PtEtaPhiEVector& vec2)
+float VLQTreeManager::deltaR(const ROOT::Math::PtEtaPhiEVector& vec1, const ROOT::Math::PtEtaPhiEVector& vec2)
 {
 	float deta = vec1.Eta() - vec2.Eta();
 	float dphi = deltaPhi(vec1, vec2);
 	return sqrt(deta*deta+dphi*dphi);
 }
-float TreeManager::scaleMass(const std::array<HiggsCandidate, 2>& hcands)
+float VLQTreeManager::scaleMass(const std::array<HiggsCandidate, 2>& hcands)
 {
 	ROOT::Math::PtEtaPhiEVector scaledH1 = (125./hcands[0].M())*hcands[0].p4();
 	ROOT::Math::PtEtaPhiEVector scaledH2 = (125./hcands[1].M())*hcands[1].p4();
 	return (scaledH1+scaledH2).M();
 }
-float TreeManager::scalePtRecoCorrMass(const std::array<HiggsCandidate, 2>& hcands)
+float VLQTreeManager::scalePtRecoCorrMass(const std::array<HiggsCandidate, 2>& hcands)
 {
 	ROOT::Math::PtEtaPhiEVector scaledH1 = (125./hcands[0].ptRecoCorrP4().M())*hcands[0].ptRecoCorrP4();
 	ROOT::Math::PtEtaPhiEVector scaledH2 = (125./hcands[1].ptRecoCorrP4().M())*hcands[1].ptRecoCorrP4();
 	return (scaledH1+scaledH2).M();
 }
-float TreeManager::calcMEff(const float& met, const std::vector<Jet>& jets)
+float VLQTreeManager::calcMEff(const float& met, const std::vector<Jet>& jets)
 {
 	float meff = met;
 	for(auto jet: jets)
@@ -751,7 +625,7 @@ float TreeManager::calcMEff(const float& met, const std::vector<Jet>& jets)
 	}
 	return meff;
 }
-float TreeManager::calcMEff(const float& met, const std::vector<Jet>& jets, const std::vector<Muon>& muons, const std::vector<Electron>& electrons)
+float VLQTreeManager::calcMEff(const float& met, const std::vector<Jet>& jets, const std::vector<Muon>& muons, const std::vector<Electron>& electrons)
 {
 	float meff = calcMEff(met, jets);
 	for(auto elec: electrons)
@@ -766,7 +640,7 @@ float TreeManager::calcMEff(const float& met, const std::vector<Jet>& jets, cons
 	}
 	return meff;
 }
-float TreeManager::calcMtBMin(const float& met, const float& met_phi, const std::vector<Jet>& jets)
+float VLQTreeManager::calcMtBMin(const float& met, const float& met_phi, const std::vector<Jet>& jets)
 {
 	float minMTB = 99999.;
 	float mex = met*cos(met_phi);

@@ -2,15 +2,13 @@
 #include <fstream>
 #include <regex>
 #include <sys/stat.h>
-#include "xhhAnalysis.h"
+#include "vlqAnalysis.h"
 #include "TROOT.h"
 
 bool m_doSystematics = true;
 std::string m_calib = "";
 bool m_debug = false;
 bool m_test = false;
-bool m_trackJetBTagging = false;
-bool m_applyBTrigSF = true;
 std::string m_inputFile = "";
 
 unsigned long m_totEvents = 0;
@@ -23,14 +21,10 @@ int main(int argc, char** argv)
 	TH1::SetDefaultSumw2();
 	if(processCommandLine(argc, argv)) return 1;
 
-	float lumi = 24.3398; //Integrated luminosity in fb^{-1} after b-jet trigger GRL
+	float lumi = 43.65; //Integrated luminosity in fb^{-1} for 2017 according to Marco
 	setupFiles(lumi); //fills m_fileList, vector of <TFile, <normalisation, cross-section> >
 	setupSystList();  //fills m_systList
 	setupTriggerList();//fills m_trigList
-    if (m_applyBTrigSF) 
-	{
-         if(!setupBTriggerSF()) return 2;
-    }
 
 	//Open the output file for the first time, to blank it. Then shut it again. 
 	//Then copy event count histograms from the input files to this blank file.
@@ -80,21 +74,15 @@ void analyseEvents(std::vector<std::pair<std::string, std::pair<double, double> 
 		hCutFlow->GetXaxis()->SetBinLabel(3, "#sum(w_{i}): All");
 		hCutFlow->GetXaxis()->SetBinLabel(4, "#sum(i): Triggered");
 		hCutFlow->GetXaxis()->SetBinLabel(5, "#sum(w_{i}): Triggered");
-		hCutFlow->GetXaxis()->SetBinLabel(6, "#sum(i): 4 b-jets, p_{T} > 40 GeV");
-		hCutFlow->GetXaxis()->SetBinLabel(7, "#sum(w_{i}): 4 b-jets, p_{T} > 40 GeV");
-		hCutFlow->GetXaxis()->SetBinLabel(8, "#sum(i): 2 Higgs candidates");
-		hCutFlow->GetXaxis()->SetBinLabel(9, "#sum(w_{i}): 2 Higgs candidates");
+		hCutFlow->GetXaxis()->SetBinLabel(6, "#sum(i): 1 large-R jet p_{T} > 300 GeV");
+		hCutFlow->GetXaxis()->SetBinLabel(7, "#sum(w_{i}): 1 jet p_{T} > 300 GeV");
+		hCutFlow->GetXaxis()->SetBinLabel(7, "#sum(i): 3 small-R jets p_{T} > 30 GeV");
+		hCutFlow->GetXaxis()->SetBinLabel(8, "#sum(w_{i}): 3 small-R jets p_{T} > 30 GeV");
+		hCutFlow->GetXaxis()->SetBinLabel(9, "#sum(i): 1 b-tagged small-R jet");
+		hCutFlow->GetXaxis()->SetBinLabel(10, "#sum(w_{i}): 1 b-tagged small-R jet");
+		hCutFlow->GetXaxis()->SetBinLabel(8, "#sum(i): 1 Higgs candidate");
+		hCutFlow->GetXaxis()->SetBinLabel(9, "#sum(w_{i}): 1 Higgs candidate");
 
-		//Setup csv file with some details about selected events
-		std::ofstream eventsOut((getNiceName(fileIt->first)+"_selectedEvents.txt").c_str());
-		eventsOut <<"Run Number, Event Number, number of jets, number of b-jets, ";
-		for(int j = 0; j < 4; ++j)
-		{
-			eventsOut<<"jet "<< j <<" pt, jet "<< j <<" mv2c10";
-			if(j < 3) eventsOut <<", ";
-			else eventsOut << std::endl;
-		}
-		
 		TreeManager treesOut(getCategory(fileIt->first)+"_"+syst);
 		Event event(fileIt, syst, m_trigList);
 		std::string fileName = fileIt->first;
@@ -109,13 +97,11 @@ void analyseEvents(std::vector<std::pair<std::string, std::pair<double, double> 
 		ElectronProducer electronProducer(event);
 		ParticleProducer partProducer(event);
 		MuonProducer muonProducer(event);
-		JetProducer ak4JetProducer(event, m_calib, m_trackJetBTagging, 70);
+		JetProducer ak4JetProducer(event, m_calib, false, 70);
 		FatJetProducer caloJet10Producer(event);
 		TrackJetProducer trackJet02Producer(event, 70);
-
-
 		HiggsCandidateProducer higgsProducer(event);
-		TopCandidateProducer topProducer;
+		VLQCandidateProducer vlqProducer(event);
 		m_totEvents += maxEvents;
 		int reportFrac = maxEvents/10;
 		for(unsigned long i = 0; i < maxEvents; ++i)
@@ -199,7 +185,6 @@ void analyseEvents(std::vector<std::pair<std::string, std::pair<double, double> 
 				hCutFlow->Fill(8);
 				hCutFlow->Fill(9, event.weight());
 			}
-			std::vector<TopCandidate> tops = topProducer.produce(combinedHiggs, ak4Jets); 
 			if(event.isMC())
 			{
 				if(isSignal(fileName))
@@ -231,7 +216,7 @@ void analyseEvents(std::vector<std::pair<std::string, std::pair<double, double> 
 					}
 				}
 			}
-			treesOut.fillTree(event, combinedHiggs, ak4Jets, electrons, muons, tops);
+			treesOut.fillTree(event, combinedHiggs, ak4Jets, electrons, muons);
 		}
 		treesOut.write(m_fOut);
 		hCutFlow->Write();
@@ -377,13 +362,9 @@ void setupFiles(float lumiFb)
 void setupTriggerList()
 {
 	//Use combined triggers for resolved + merged
-	//4-jet triggers
 	m_trigList = std::vector<std::string>();
-	m_trigList.push_back("HLT_2j35_bmv2c2060_split_2j35_L14J15.0ETA25");
-	//3-jet trigger
-	m_trigList.push_back("HLT_j100_2j55_bmv2c2060_split");
 	//1-jet trigger
-	m_trigList.push_back("HLT_j225_bmv2c2060_split");
+	m_trigList.push_back("HLT_j460");
 }
 bool setupBTriggerSF()
 {

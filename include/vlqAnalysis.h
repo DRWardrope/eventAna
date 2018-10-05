@@ -1,11 +1,11 @@
 /************************************************************************************
-*	hh->4b analysis code
-*	v3.0 22nd March 2016
-*	Note: should be migrated into XhhMixed when possible.
+*	B->bH->bbb analysis code
+*	v1.0 5th October 2018
+*	Note: Just a quick test, to help out Marco
 *	David Wardrope
 *************************************************************************************/
-#ifndef XHHANALYSIS_H
-#define XHHANALYSIS_H
+#ifndef VLQANALYSIS_H
+#define VLQANALYSIS_H
 #include <functional>
 #include <memory>
 #include <vector>
@@ -24,23 +24,11 @@
 #include "TopCandidateProducer.h"
 #include "TrackJetProducer.h"
 #include "TRandom3.h"
-#include "HHTreeManager.h"
+#include "VLQTreeManager.h"
 
 //TRandom3* m_higgsRand = new TRandom3(25151661);
 void addFile(std::string, double);
 void analyseEvents(std::vector<std::pair<std::string, std::pair<double, double> > >::const_iterator);////The main loop over events.
-//float calcDhhScore(const HiggsCandidate& h1, const HiggsCandidate& h2);
-std::vector<HiggsCandidate> chooseBestPair(const std::vector<HiggsCandidate>& hcands,
-                                                std::function<float(const HiggsCandidate&, const HiggsCandidate&)>& bestPairChooser);
-std::vector<HiggsCandidate> chooseHiggsCandidates(const std::vector<HiggsCandidate>&, const std::vector<HiggsCandidate>&);
-int combinedCategory(const int& cat1, const int& cat2);
-int countTags(const std::array<HiggsCandidate, 2>&);
-std::string eventCatName(const int& i);
-std::vector<HiggsCandidate> findHiggsCandidates(const std::vector<Jet>&, const std::vector<Jet>&, const std::vector<Jet>&,
-												 const std::vector<const Particle*>&);
-std::vector<HiggsCandidate> findHiggsCandidates(const std::vector<Jet>&, const std::vector<Jet>&, const std::vector<const Particle*>&);
-std::vector<HiggsCandidate> findMergedHiggsCandidates(const std::vector<Jet>&, const std::vector<Jet>&, const std::vector<const Particle*>&);
-std::vector<HiggsCandidate> findResolvedHiggsCandidates(const std::vector<Jet>&, const std::vector<const Particle*>&);
 std::string getCategory(TFile* file);
 std::string getCategory(const std::string& name_notnice);
 int getDSID(const std::string& fileName);
